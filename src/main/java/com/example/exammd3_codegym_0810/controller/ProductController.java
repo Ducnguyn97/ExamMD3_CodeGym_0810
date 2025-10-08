@@ -13,6 +13,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 @WebServlet(name = "ProductController", urlPatterns = "/products")
@@ -39,6 +40,9 @@ public class ProductController extends HttpServlet {
                     break;
                 case "delete":
                    deleteProduct(request,response);
+                    break;
+                case "search":
+                    searchProduct(request,response);
                     break;
                 default:
                    listProducts(request, response);
@@ -123,6 +127,32 @@ public class ProductController extends HttpServlet {
             System.out.println("Product: " + product.getProductName() + ", ID: " + product.getProductId());
         }
         request.setAttribute("products", products);
+        RequestDispatcher rd = request.getRequestDispatcher("/product/list.jsp");
+        rd.forward(request, response);
+    }
+    private void searchProduct(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException, SQLException {
+        String name = request.getParameter("searchName");
+        Double price = null;
+        String category = request.getParameter("searchCategory");
+        String color = request.getParameter("searchColor");
+
+
+        String priceParam = request.getParameter("searchPrice");
+        if (priceParam != null && !priceParam.trim().isEmpty()) {
+            try{
+                price = Double.parseDouble(priceParam);
+            }catch(NumberFormatException e){
+                e.printStackTrace();
+            }
+        }
+
+        List<Product> products = productDAOImpl.searchProduct(name,price,category,color);
+        request.setAttribute("products", products);
+        request.setAttribute("searchName", name);
+        request.setAttribute("searchColor", color);
+        request.setAttribute("searchPrice", priceParam);
+        request.setAttribute("searchCategory", category);
         RequestDispatcher rd = request.getRequestDispatcher("/product/list.jsp");
         rd.forward(request, response);
     }

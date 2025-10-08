@@ -21,6 +21,8 @@ public class ProductDAOImpl implements ProductDAO {
             "DELETE FROM product WHERE id = ?";
     private static final String UPDATE_PRODUCTS_SQL =
             "UPDATE product SET name = ?, price = ?,quantity =?,  color= ?, description = ?, category = ? WHERE id = ?";
+    private static final String SEARCH_PRODUCTS_SQL =
+            "SELECT * FROM product WHERE 1=1";
     @Override
     public void addProduct(Product product) throws SQLException {
         try(Connection conn = JDBCUtils.getConnection();
@@ -113,5 +115,52 @@ public class ProductDAOImpl implements ProductDAO {
             rowDeleted = ps.executeUpdate() > 0;
         }
         return rowDeleted;
+    }
+
+    @Override
+    public List<Product> searchProduct(String name, Double price, String category, String color)
+            throws SQLException {
+        List<Product> products = new ArrayList<>();
+        StringBuilder sqlBuilder = new StringBuilder(SEARCH_PRODUCTS_SQL);
+        List<Object> params = new ArrayList<>();
+
+        if(name != null && !name.trim().isEmpty()){
+            sqlBuilder.append(" AND name LIKE ?");
+            params.add("%"+name+"%");
+        }
+        if(price != null){
+            sqlBuilder.append(" AND price = ?");
+            params.add(price);
+        }
+        if(category != null && !category.trim().isEmpty()){
+            sqlBuilder.append(" AND category LIKE ?");
+            params.add("%" + category+"%");
+        }
+        if(color != null && !color.trim().isEmpty()){
+            sqlBuilder.append(" AND color LIKE ?");
+            params.add("%" + color + "%");
+        }
+        try(Connection conn = JDBCUtils.getConnection();
+        PreparedStatement ps = conn.prepareStatement(sqlBuilder.toString())){
+            for(int i = 0; i < params.size(); i++){
+                ps.setObject(i + 1, params.get(i));
+            }
+            System.out.println(ps);
+            ResultSet rs = ps.executeQuery();
+            while(rs.next()){
+                int id = rs.getInt("id");
+                String productName = rs.getString("name");
+                double productPrice = rs.getDouble("price");
+                int productQuantity = rs.getInt("quantity");
+                String productColor = rs.getString("color");
+                String productDescription = rs.getString("description");
+                String productCategory = rs.getString("category");
+                products.add(new Product(id,productName,productPrice,productQuantity,productColor, productDescription,productCategory));
+            }
+        }catch(SQLException e){
+            JDBCUtils.printSQLException(e);
+        }
+
+        return products;
     }
 }

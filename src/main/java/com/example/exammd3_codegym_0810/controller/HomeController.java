@@ -12,7 +12,7 @@ import java.io.IOException;
 public class HomeController extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        response.sendRedirect(request.getContextPath() + "/product/list.jsp");
+        response.sendRedirect(request.getContextPath() + "/products");
     }
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {

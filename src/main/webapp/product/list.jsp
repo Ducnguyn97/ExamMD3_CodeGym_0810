@@ -25,31 +25,51 @@
     <h1 class="text-center mb-4">Management Product</h1>
 
     <!-- Search Form -->
+    <!-- Search Form -->
     <div class="search-form">
         <h5>Find Product</h5>
-        <form action="/products" method="get" class="row g-3">
+        <form action="${pageContext.request.contextPath}/products" method="get" class="row g-3">
+            <input type="hidden" name="action" value="search">
+
             <div class="col-md-3">
                 <label class="form-label">Product Name:</label>
-                <input type="text" class="form-control" name="searchName" placeholder="Enter Product Name">
+                <input type="text" class="form-control" name="searchName"
+                       placeholder="Enter Product Name" value="${searchName}">
             </div>
             <div class="col-md-2">
                 <label class="form-label">Price:</label>
-                <input type="number" class="form-control" name="searchPrice" placeholder="Enter Price">
+                <input type="number" step="0.01" class="form-control" name="searchPrice"
+                       placeholder="Enter Price" value="${searchPrice}">
             </div>
             <div class="col-md-2">
                 <label class="form-label">Category:</label>
-                <input type="text" class="form-control" name="searchCategory" placeholder="Enter Category">
+                <input type="text" class="form-control" name="searchCategory"
+                       placeholder="Enter Category" value="${searchCategory}">
             </div>
             <div class="col-md-2">
                 <label class="form-label">Color:</label>
-                <input type="text" class="form-control" name="searchColor" placeholder="Enter Color">
+                <input type="text" class="form-control" name="searchColor"
+                       placeholder="Enter Color" value="${searchColor}">
             </div>
             <div class="col-md-3 d-flex align-items-end">
                 <button type="submit" class="btn btn-primary me-2">Search</button>
-                <button type="reset" class="btn btn-secondary">Clear</button>
+                <a href="${pageContext.request.contextPath}/products" class="btn btn-secondary">Clear</a>
             </div>
         </form>
     </div>
+
+    <!-- Hiển thị thông tin tìm kiếm -->
+    <c:if test="${not empty searchName or not empty searchPrice or not empty searchCategory or not empty searchColor}">
+        <div class="alert alert-info mt-3">
+            <strong>Search Results:</strong>
+            <c:if test="${not empty searchName}">Name: "${searchName}" </c:if>
+            <c:if test="${not empty searchPrice}">Price: ${searchPrice} </c:if>
+            <c:if test="${not empty searchCategory}">Category: "${searchCategory}" </c:if>
+            <c:if test="${not empty searchColor}">Color: "${searchColor}" </c:if>
+            - Found ${products.size()} product(s)
+            <a href="${pageContext.request.contextPath}/products" class="btn btn-sm btn-outline-secondary ms-2">Show All</a>
+        </div>
+    </c:if>
 
     <!-- Product Table -->
     <div class="d-flex justify-content-between align-items-center mb-3">
